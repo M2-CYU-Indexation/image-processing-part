@@ -1,0 +1,24 @@
+
+==== BUT ====
+    Une application qui prend en param le nom du dossier qui contient les images, 
+    et pour chacune des images va récupérer les informations.
+
+    Donc 2 params:
+        - le dossier / fichier d'entrée 
+        - le dossier de sortie
+        ==> TJRS 2 params
+
+
+==== Ce qu'il y a dans l'index. ====
+    - name : string (varchar)
+    - width : int
+    - height : int
+    - grayHistogram : array 255 values
+    - redHistogram : array 255 values
+    - greenHistogram : array 255 values
+    - blueHistogram : array 255 values
+    - averageColor : int (hexa)
+    - gradientNormMean : double # Pour témoigner de zone texturée ou non (pas suffisant)
+    - outlines : tableau de pixels
+    - nbOutlinePixels : int
+    - isRGB : bool # false == greyscale
