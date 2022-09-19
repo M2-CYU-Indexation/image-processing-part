@@ -10,7 +10,7 @@
 
 
 ==== Ce qu'il y a dans l'index. ====
-    - name : string (varchar)
+    ==> Pas de nom, déjà stocké dans l'image
     - width : int
     - height : int
     - grayHistogram : array 255 values
