@@ -1,0 +1,182 @@
+#include "img_processes.h"
+
+#include <memory.h>
+
+#include "img/process/convolutions.h"
+
+#define THRESHOLD 30
+
+void fillHistogram(byte** pixels, ImageInfos* infos, long* array)
+{
+    memset(array, 0, 255 * sizeof(long));
+    for (long h = infos->nrl; h < infos->nrh; h++)
+    {
+        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        {
+            array[pixels[h][w]]++;
+        }
+    }
+}
+void fillHistogramZeroes(long* array)
+{
+    memset(array, 0, 255 * sizeof(long));
+}
+
+double matrixAverage(byte** matrix, ImageInfos* infos)
+{
+    unsigned long sum = 0l;
+    unsigned long count = 0l;
+    for (long h = infos->nrl; h < infos->nrh; h++)
+    {
+        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        {
+            sum += matrix[h][w];
+            count += 1;
+        }
+    }
+    return (double)sum / (double)count;
+}
+
+int averageColorGreyscale(byte** pixels, ImageInfos* infos, double* redRatio, double* greenRatio, double* blueRatio)
+{
+    unsigned long sum = 0l;
+    unsigned long count = 0l;
+    for (long h = infos->nrl; h < infos->nrh; h++)
+    {
+        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        {
+            sum += pixels[h][w];
+            count += 1;
+        }
+    }
+    long averageL = sum / count;
+    char average = sum / count;
+    // This is not true, but this adds to the fact that this
+    // is a greyscale image.
+    *redRatio = *blueRatio = *greenRatio = 0.0;
+    return rgbToInt(average, average, average);
+}
+
+int averageColor(rgb8** pixels, ImageInfos* infos, double* redRatio, double* greenRatio, double* blueRatio)
+{
+    unsigned long redSum = 0l, greenSum = 0l, blueSum = 0l;
+    unsigned long count = 0l;
+
+    for (long h = infos->nrl; h < infos->nrh; h++)
+    {
+        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        {
+            rgb8 pixel = pixels[h][w];
+            redSum += pixel.r;
+            greenSum += pixel.g;
+            blueSum += pixel.b;
+            count += 1;
+        }
+    }
+    unsigned long total = redSum + greenSum + blueSum;
+    char redAverage = redSum / total;
+    char greenAverage = greenSum / total;
+    char blueAverage = blueSum / total;
+
+    *redRatio = (double)redSum / (double)total;
+    *greenRatio = (double)greenSum / (double)total;
+    *blueRatio = (double)blueSum / (double)total;
+
+    return rgbToInt(redAverage, greenAverage, blueAverage);
+}
+
+int rgbToInt(char r, char g, char b)
+{
+    return (r << 16) | (g << 8) | (b);
+}
+
+void intToRbg(int val, char* r, char* g, char* b)
+{
+    *r = (val >> 16) & 0x0ff;
+    *g = (val >> 8) & 0x0ff;
+    *b = (val) & 0x0ff;
+}
+
+byte** rgbImageToGreyscale(rgb8** pixels, ImageInfos* infos)
+{
+    // Use the luminosity method, as this provides better results than other ones
+    // grayscale = 0.3 * R + 0.59 * G + 0.11 * B
+    byte** greyscale = bmatrix(infos->nrl, infos->nrh, infos->ncl, infos->nch);
+    for (long h = infos->nrl; h < infos->nrh; h++)
+    {
+        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        {
+            rgb8 p = pixels[h][w];
+            greyscale[h][w] = (double)p.r * 0.3 + (double)p.g * 0.59 + (double)p.b * 0.11;
+        }
+    }
+    return greyscale;
+}
+
+void gradientNormRelated(byte** pixels, ImageInfos* infos, double* gradientNormAverage, Rect* outlinesBox, Position* outlinesBarycenter, long* nbOutlines)
+{
+    outlinesBarycenter->x = 0;
+    byte** gradientNorm = gradientNorm3x3(pixels, *infos);
+    *gradientNormAverage = matrixAverage(gradientNorm, infos);
+    byte** outlines = contourMatrix3x3FromGradientNorm(gradientNorm, *infos, THRESHOLD);
+    // Find the box, coords sums (for barycenter) and count
+    *nbOutlines = 0;
+    unsigned long barycenterSumX = 0l, barycenterSumY = 0l;
+    long outMinX = 9999999999, outMaxX = 0, outMinY = 9999999999, outMaxY = 0;
+    for (long h = infos->nrl; h < infos->nrh; h++)
+    {
+        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        {
+            if (outlines[h][w] == 0)
+            {
+                continue;
+            }
+
+            // sums
+            (*nbOutlines)++;
+            barycenterSumX += w;
+            barycenterSumY += h;
+
+            // min / max assignation
+            if (w < outMinX)
+            {
+                outMinX = w;
+            }
+            else if (w > outMaxX)
+            {
+                outMaxX = w;
+            }
+
+            if (h < outMinY)
+            {
+                outMinY = h;
+            }
+            else if (h > outMaxY)
+            {
+                outMaxY = h;
+            }
+        }
+    }
+    // Compute final values
+    outlinesBarycenter->x = barycenterSumX / (*nbOutlines);
+    outlinesBarycenter->y = barycenterSumY / (*nbOutlines);
+
+    outlinesBox->minX = outMinX;
+    outlinesBox->maxX = outMaxX;
+    outlinesBox->minY = outMinY;
+    outlinesBox->maxY = outMaxY;
+
+    SavePGM_bmatrix(outlines, infos->nrl, infos->nrh, infos->ncl, infos->nch, "/home/aldric-vs/COURS/M2/S9/Indexation/tmp/COUCOU.pgm");
+    freeGreyscale(gradientNorm, infos);
+    freeGreyscale(outlines, infos);
+}
+
+void freeGreyscale(byte** pixels, ImageInfos* infos)
+{
+    free_bmatrix(pixels, infos->nrl, infos->nrh, infos->ncl, infos->nch);
+}
+
+void freeRGB(rgb8** pixels, ImageInfos* infos)
+{
+    free_rgb8matrix(pixels, infos->nrl, infos->nrh, infos->ncl, infos->nch);
+}

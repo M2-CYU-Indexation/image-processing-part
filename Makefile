@@ -12,12 +12,14 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP
 
+LDFLAGS ?= -lm
+
 main: create_folders $(OBJS)
 	gcc $(OBJS) -g -o $(BIN_DIR)/indexer $(LDFLAGS)
 
 $(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
-	gcc -g $(CPPFLAGS) -c $< -o $@
+	gcc -g $(CPPFLAGS) -c $< -o $@ $(LDFLAGS)
 
 create_folders:
 	@mkdir -p $(BIN_DIR)

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "input/input.h"
+#include "img/img_infos.h"
 #include "file/file_stat.h"
 
 int compareFiles(const FTSENT** one, const FTSENT** two)
@@ -14,16 +15,11 @@ int compareFiles(const FTSENT** one, const FTSENT** two)
 
 void processFile(char* inputPath, char* outputPath)
 {
-    char* extension = findExtension(inputPath);
-    if (extension == NULL)
+    ImgDescriptors infos;
+    int resFillInfos = fillDescriptors(inputPath, &infos);
+    if (resFillInfos != 0)
     {
-        fprintf(stderr, "Path does not represent a file, or the file does not have an extension\n");
-    } else if (strcmp(".ppm", extension))
-    {
-        printf("PPM !\n");
-    } else if (strcmp(".pgm", extension))
-    {
-        printf("PGM !\n");
+        fprintf(stderr, "Error code %d raised when filling informations\n", resFillInfos);
     }
 }
 
