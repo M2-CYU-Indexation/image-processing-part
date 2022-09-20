@@ -41,6 +41,6 @@ int fillDescriptors_PGM(char* imagePath, ImgDescriptors* desc)
         &desc->outlinesBarycenter,
         &desc->nbOutlines
     );
-
+    freeGreyscale(image, &infos);
     return 0;
 }

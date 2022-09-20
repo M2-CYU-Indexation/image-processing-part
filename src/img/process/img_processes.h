@@ -8,9 +8,15 @@
 
 /**
  * Fill the array variable with the image data provided.
- * The array is expected to be of size 255.
+ * The array is expected to be of size 256.
  */
 void fillHistogram(byte** pixels, ImageInfos* infos, long *array);
+
+/**
+ * Fill the array variable with the image data provided.
+ * All arrays are expected to be of size 256.
+ */
+void fillColorHistograms(rgb8** pixels, ImageInfos* infos, long *greyHist, long *redHist, long *greenHist, long *blueHist);
 
 /**
  * Fill the array variable with only zeroes.
@@ -30,6 +36,8 @@ int averageColor(rgb8** pixels, ImageInfos* infos, double* redRatio, double* gre
 int rgbToInt(char r, char g, char b);
 
 void intToRbg(int val, char *r, char *g, char *b);
+
+byte rgbToGrey(byte r, byte g, byte b);
 
 byte** rgbImageToGreyscale(rgb8** pixels, ImageInfos* infos);
 

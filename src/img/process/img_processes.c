@@ -8,27 +8,48 @@
 
 void fillHistogram(byte** pixels, ImageInfos* infos, long* array)
 {
-    memset(array, 0, 255 * sizeof(long));
-    for (long h = infos->nrl; h < infos->nrh; h++)
+    memset(array, 0, 256 * sizeof(long));
+    for (long h = infos->nrl; h <= infos->nrh; h++)
     {
-        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        for (long w = infos->ncl; w <= infos->nch; w++)
         {
             array[pixels[h][w]]++;
         }
     }
 }
+
+void fillColorHistograms(rgb8** pixels, ImageInfos* infos, long *greyHist, long *redHist, long *greenHist, long *blueHist)
+{
+    memset(greyHist, 0, 256 * sizeof(long));
+    memset(redHist, 0, 256 * sizeof(long));
+    memset(greenHist, 0, 256 * sizeof(long));
+    memset(blueHist, 0, 256 * sizeof(long));
+    for (long h = infos->nrl; h <= infos->nrh; h++)
+    {
+        for (long w = infos->ncl; w <= infos->nch; w++)
+        {
+            rgb8 pixel = pixels[h][w];
+            byte greyVal = rgbToGrey(pixel.r, pixel.g, pixel.b);
+            greyHist[greyVal]++;
+            redHist[pixel.r]++;
+            greenHist[pixel.g]++;
+            blueHist[pixel.b]++;
+        }
+    }
+}
+
 void fillHistogramZeroes(long* array)
 {
-    memset(array, 0, 255 * sizeof(long));
+    memset(array, 0, 256 * sizeof(long));
 }
 
 double matrixAverage(byte** matrix, ImageInfos* infos)
 {
     unsigned long sum = 0l;
     unsigned long count = 0l;
-    for (long h = infos->nrl; h < infos->nrh; h++)
+    for (long h = infos->nrl; h <= infos->nrh; h++)
     {
-        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        for (long w = infos->ncl; w <= infos->nch; w++)
         {
             sum += matrix[h][w];
             count += 1;
@@ -41,9 +62,9 @@ int averageColorGreyscale(byte** pixels, ImageInfos* infos, double* redRatio, do
 {
     unsigned long sum = 0l;
     unsigned long count = 0l;
-    for (long h = infos->nrl; h < infos->nrh; h++)
+    for (long h = infos->nrl; h <= infos->nrh; h++)
     {
-        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        for (long w = infos->ncl; w <= infos->nch; w++)
         {
             sum += pixels[h][w];
             count += 1;
@@ -62,9 +83,9 @@ int averageColor(rgb8** pixels, ImageInfos* infos, double* redRatio, double* gre
     unsigned long redSum = 0l, greenSum = 0l, blueSum = 0l;
     unsigned long count = 0l;
 
-    for (long h = infos->nrl; h < infos->nrh; h++)
+    for (long h = infos->nrl; h <= infos->nrh; h++)
     {
-        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        for (long w = infos->ncl; w <= infos->nch; w++)
         {
             rgb8 pixel = pixels[h][w];
             redSum += pixel.r;
@@ -97,17 +118,22 @@ void intToRbg(int val, char* r, char* g, char* b)
     *b = (val) & 0x0ff;
 }
 
+byte rgbToGrey(byte r, byte g, byte b)
+{
+    return (double)r * 0.3 + (double)g * 0.59 + (double)b * 0.11;
+}
+
 byte** rgbImageToGreyscale(rgb8** pixels, ImageInfos* infos)
 {
     // Use the luminosity method, as this provides better results than other ones
     // grayscale = 0.3 * R + 0.59 * G + 0.11 * B
     byte** greyscale = bmatrix(infos->nrl, infos->nrh, infos->ncl, infos->nch);
-    for (long h = infos->nrl; h < infos->nrh; h++)
+    for (long h = infos->nrl; h <= infos->nrh; h++)
     {
-        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        for (long w = infos->ncl; w <= infos->nch; w++)
         {
             rgb8 p = pixels[h][w];
-            greyscale[h][w] = (double)p.r * 0.3 + (double)p.g * 0.59 + (double)p.b * 0.11;
+            greyscale[h][w] = rgbToGrey(p.r, p.g, p.b);
         }
     }
     return greyscale;
@@ -123,9 +149,9 @@ void gradientNormRelated(byte** pixels, ImageInfos* infos, double* gradientNormA
     *nbOutlines = 0;
     unsigned long barycenterSumX = 0l, barycenterSumY = 0l;
     long outMinX = 9999999999, outMaxX = 0, outMinY = 9999999999, outMaxY = 0;
-    for (long h = infos->nrl; h < infos->nrh; h++)
+    for (long h = infos->nrl; h <= infos->nrh; h++)
     {
-        for (long w = infos->ncl + 1; w < infos->nch; w++)
+        for (long w = infos->ncl; w <= infos->nch; w++)
         {
             if (outlines[h][w] == 0)
             {

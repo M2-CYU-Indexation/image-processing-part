@@ -76,8 +76,6 @@ int main(int argc, char  *argv[])
 {
     Input input;
 
-    printf("%d\n", isFile("/home/aldric-vs/COURS/M2/S9/Indexation/PpmsPgms/archive10pgm/arbre2.pgm"));
-
     int respRetrieve = retrieveInput(argc, argv, &input);
     if (respRetrieve != 0)
     {
