@@ -1,7 +1,7 @@
 #ifndef __IMG_INFOS_PGM_H__
 #define __IMG_INFOS_PGM_H__
 
-#include "img/img_infos.h"
+#include "img/img_descriptors.h"
 
 /**
  * Fills informations for a pgm image.

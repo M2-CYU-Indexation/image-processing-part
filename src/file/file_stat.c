@@ -31,6 +31,22 @@ int isFile(char* path)
     return S_ISREG(fileStats.st_mode);
 }
 
+char* findBasename(char* path)
+{
+    char* ptr = strrchr(path, '/');
+    if (ptr == NULL)
+    {
+        // the basename is the entire path
+        return path;
+    }
+    // If the path ends with a backslash without filename after.
+    if (ptr[1] == '\0')
+    {
+        return NULL;
+    }
+    return ptr + 1;
+}
+
 char* findExtension(char* path)
 {
     return strrchr(path, '.');

@@ -1,5 +1,5 @@
-#ifndef __IMG_INFOS_H__
-#define __IMG_INFOS_H__
+#ifndef __IMG_DESCRIPTORS_H__
+#define __IMG_DESCRIPTORS_H__
 
 #include "img/model/geometry.h"
 
@@ -8,6 +8,7 @@
  */
 typedef struct img_descriptors_struct
 {
+    char name[256];
     long width;
     long height;
     long greyHistogram[256];
@@ -30,12 +31,12 @@ typedef struct img_descriptors_struct
  * This returns 0 on success : another values must be 
  * considered as errors.
  */
-int fillDescriptors(char* imagePath, ImgDescriptors* desc);
+int fillDescriptors(char* imagePath, char* basename, ImgDescriptors* desc);
 
 /**
  * Clean and delete all previously allocated memory in the given struct.
  * This does not free this struct itself.
  */
-void disposeImgInfos(ImgDescriptors* imgDesc);
+void disposeImgDescriptors(ImgDescriptors* imgDesc);
 
-#endif // __IMG_INFOS_H__
+#endif // __IMG_DESCRIPTORS_H__

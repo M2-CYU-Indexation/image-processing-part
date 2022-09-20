@@ -5,21 +5,31 @@
 #include <string.h>
 
 #include "input/input.h"
-#include "img/img_infos.h"
+#include "img/img_descriptors.h"
 #include "file/file_stat.h"
+#include "file/serializer.h"
 
 int compareFiles(const FTSENT** one, const FTSENT** two)
 {
     return (strcmp((*one)->fts_name, (*two)->fts_name));
 }
 
-void processFile(char* inputPath, char* outputPath)
+void processFile(char* inputPath, char* basename, char* outputPath)
 {
+
     ImgDescriptors infos;
-    int resFillInfos = fillDescriptors(inputPath, &infos);
+    int resFillInfos = fillDescriptors(inputPath, basename, &infos);
     if (resFillInfos != 0)
     {
         fprintf(stderr, "Error code %d raised when filling informations\n", resFillInfos);
+        return;
+    }
+
+    int resSerialize = serialize_descriptors(&infos, outputPath);
+    if (resSerialize != 0)
+    {
+        fprintf(stderr, "Error code %d raised when serializing informations\n", resSerialize);
+        return;
     }
 }
 
@@ -62,7 +72,7 @@ void processFolder(char* inputPath, char* outputPath)
             {
                 fileCounter++;
                 printf("Process file n°%d : \"%s\"\n", fileCounter, path);
-                processFile(path, outputPath);
+                processFile(path, child->fts_name, outputPath);
             }
 
             child = child->fts_link;
@@ -96,8 +106,9 @@ int main(int argc, char  *argv[])
     }
     else
     {
+        char* filename = findBasename(inputPath);
         printf("Process file \"%s\"\n", inputPath);
-        processFile(inputPath, input.outputPath);
+        processFile(inputPath, filename, input.outputPath);
     }
 
     return 0;

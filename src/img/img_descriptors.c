@@ -1,4 +1,4 @@
-#include "img_infos.h"
+#include "img_descriptors.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -7,8 +7,10 @@
 #include "img/extensions/pgm/img_infos_pgm.h"
 #include "img/extensions/ppm/img_infos_ppm.h"
 
-int fillDescriptors(char* imagePath, ImgDescriptors* infos)
+int fillDescriptors(char* imagePath, char* basename, ImgDescriptors* infos)
 {
+
+    strcpy(infos->name, basename);
     char* extension = findExtension(imagePath);
     if (extension == NULL)
     {
@@ -29,4 +31,9 @@ int fillDescriptors(char* imagePath, ImgDescriptors* infos)
         fprintf(stderr, "The extension \"%s\" is not supported\n", extension);
         return 2;
     }
+}
+
+void disposeImgDescriptors(ImgDescriptors* imgDesc)
+{
+    // Nothing to deallocate.
 }
