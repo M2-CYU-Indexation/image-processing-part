@@ -27,12 +27,19 @@ int fillDescriptors_PPM(char* imagePath, ImgDescriptors* desc)
     loadPPM(imagePath, &image, &infos);
     desc->width = infos.nch - infos.ncl;
     desc->height = infos.nrh - infos.nrl;
-    // TODO : check if greyscale
-    // TODO : if greyscale, get the greyscale directly from one channel
-    desc->isRGB = 1;
+    desc->isRGB = !isGreyscale(image, &infos);
     fillColorHistograms(image, &infos, &desc->greyHistogram, &desc->redHistogram, &desc->greenHistogram, &desc->blueHistogram);
     desc->averageColor = averageColor(image, &infos, &desc->redRatio, &desc->greenRatio, &desc->blueRatio);
-    byte** greyscale = rgbImageToGreyscale(image, &infos);
+    byte** greyscale;
+    if (desc->isRGB)
+    {
+        greyscale = rgbImageToGreyscale(image, &infos);
+    }
+    else
+    {
+        greyscale = rgbImageToGreyscaleFromOneChannel(image, &infos);
+    }
+     
     SavePGM_bmatrix(greyscale, infos.nrl, infos.nrh, infos.ncl, infos.nch, "/home/aldric-vs/COURS/M2/S9/Indexation/tmp/OUI.pgm");
     gradientNormRelated(
         greyscale, 

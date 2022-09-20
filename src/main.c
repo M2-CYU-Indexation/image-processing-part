@@ -66,8 +66,6 @@ void processFolder(char* inputPath, char* outputPath)
             strcat(path, dirPath);
             strcat(path, basename);
 
-            printf("%s\n", path);
-            
             if (isFile(path))
             {
                 fileCounter++;

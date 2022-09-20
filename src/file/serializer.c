@@ -36,8 +36,6 @@ int serialize_descriptors(ImgDescriptors* descriptors, char* outputDirectory)
     strncat(completePath, descriptors->name, nCharsStem);
     strcat(completePath, ".txt");
 
-    printf("WRITE TO %s\n", completePath);
-
     FILE* file = fopen(completePath, "w");
     if (file == NULL)
     {

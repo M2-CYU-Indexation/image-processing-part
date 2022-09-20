@@ -41,6 +41,10 @@ byte rgbToGrey(byte r, byte g, byte b);
 
 byte** rgbImageToGreyscale(rgb8** pixels, ImageInfos* infos);
 
+byte** rgbImageToGreyscaleFromOneChannel(rgb8** pixels, ImageInfos* infos);
+
+int isGreyscale(rgb8** pixels, ImageInfos* infos);
+
 /**
  * Compute the gradient norm of the image and retrieve wanted informations.
  */

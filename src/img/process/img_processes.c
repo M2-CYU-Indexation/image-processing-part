@@ -139,6 +139,36 @@ byte** rgbImageToGreyscale(rgb8** pixels, ImageInfos* infos)
     return greyscale;
 }
 
+byte** rgbImageToGreyscaleFromOneChannel(rgb8** pixels, ImageInfos* infos)
+{
+    byte** greyscale = bmatrix(infos->nrl, infos->nrh, infos->ncl, infos->nch);
+    for (long h = infos->nrl; h <= infos->nrh; h++)
+    {
+        for (long w = infos->ncl; w <= infos->nch; w++)
+        {
+            rgb8 p = pixels[h][w];
+            greyscale[h][w] = (pixels[h][w]).r;
+        }
+    }
+    return greyscale;
+}
+
+int isGreyscale(rgb8** pixels, ImageInfos* infos)
+{
+    for (long h = infos->nrl; h <= infos->nrh; h++)
+    {
+        for (long w = infos->ncl; w <= infos->nch; w++)
+        {
+            rgb8 pixel = pixels[h][w];
+            if (!(pixel.r == pixel.g && pixel.g == pixel.b))
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 void gradientNormRelated(byte** pixels, ImageInfos* infos, double* gradientNormAverage, Rect* outlinesBox, Position* outlinesBarycenter, long* nbOutlines)
 {
     outlinesBarycenter->x = 0;
@@ -192,7 +222,6 @@ void gradientNormRelated(byte** pixels, ImageInfos* infos, double* gradientNormA
     outlinesBox->minY = outMinY;
     outlinesBox->maxY = outMaxY;
 
-    SavePGM_bmatrix(outlines, infos->nrl, infos->nrh, infos->ncl, infos->nch, "/home/aldric-vs/COURS/M2/S9/Indexation/tmp/COUCOU.pgm");
     freeGreyscale(gradientNorm, infos);
     freeGreyscale(outlines, infos);
 }
