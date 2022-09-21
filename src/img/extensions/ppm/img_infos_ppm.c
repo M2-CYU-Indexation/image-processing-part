@@ -40,7 +40,6 @@ int fillDescriptors_PPM(char* imagePath, ImgDescriptors* desc)
         greyscale = rgbImageToGreyscaleFromOneChannel(image, &infos);
     }
      
-    SavePGM_bmatrix(greyscale, infos.nrl, infos.nrh, infos.ncl, infos.nch, "/home/aldric-vs/COURS/M2/S9/Indexation/tmp/OUI.pgm");
     gradientNormRelated(
         greyscale, 
         &infos, 
