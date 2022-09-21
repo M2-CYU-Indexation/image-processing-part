@@ -70,8 +70,7 @@ int averageColorGreyscale(byte** pixels, ImageInfos* infos, double* redRatio, do
             count += 1;
         }
     }
-    long averageL = sum / count;
-    char average = sum / count;
+    byte average = (double) sum / (double) count * 255.0;
     // This is not true, but this adds to the fact that this
     // is a greyscale image.
     *redRatio = *blueRatio = *greenRatio = 0.0;
@@ -95,9 +94,9 @@ int averageColor(rgb8** pixels, ImageInfos* infos, double* redRatio, double* gre
         }
     }
     unsigned long total = redSum + greenSum + blueSum;
-    char redAverage = redSum / total;
-    char greenAverage = greenSum / total;
-    char blueAverage = blueSum / total;
+    byte redAverage = (double) redSum / (double) total * 255.0;
+    byte greenAverage = (double) greenSum / (double) total * 255.0;
+    byte blueAverage = (double) blueSum / (double) total * 255.0;
 
     *redRatio = (double)redSum / (double)total;
     *greenRatio = (double)greenSum / (double)total;
@@ -106,12 +105,12 @@ int averageColor(rgb8** pixels, ImageInfos* infos, double* redRatio, double* gre
     return rgbToInt(redAverage, greenAverage, blueAverage);
 }
 
-int rgbToInt(char r, char g, char b)
+int rgbToInt(byte r, byte g, byte b)
 {
     return (r << 16) | (g << 8) | (b);
 }
 
-void intToRbg(int val, char* r, char* g, char* b)
+void intToRbg(int val, byte* r, byte* g, byte* b)
 {
     *r = (val >> 16) & 0x0ff;
     *g = (val >> 8) & 0x0ff;

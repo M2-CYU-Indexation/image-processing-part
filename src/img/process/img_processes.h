@@ -33,9 +33,9 @@ int averageColorGreyscale(byte** pixels, ImageInfos* infos, double* redRatio, do
 
 int averageColor(rgb8** pixels, ImageInfos* infos, double* redRatio, double* greenRatio, double* blueRatio);
 
-int rgbToInt(char r, char g, char b);
+int rgbToInt(byte r, byte g, byte b);
 
-void intToRbg(int val, char *r, char *g, char *b);
+void intToRbg(int val, byte *r, byte *g, byte *b);
 
 byte rgbToGrey(byte r, byte g, byte b);
 
